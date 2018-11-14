@@ -18,6 +18,8 @@ class NegociacaoController {
         this._negociacoes.adiciona(this._criaNegociacao())
         this._negociacoesView.update(this._negociacoes);
         this._limpaFormulario();
+
+        console.log(this._negociacoes.volumeTotal);
     }
 
     _limpaFormulario() {
