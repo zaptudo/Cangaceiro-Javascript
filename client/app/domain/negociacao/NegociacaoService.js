@@ -2,29 +2,33 @@ class NegociacaoService {
 
     obterNegociacoesDaSemana(cb) {
 
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', 'negociacoes/semana');
+        return new Promise((resouve, reject) => {
 
-        xhr.onreadystatechange = () => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', 'negociacoes/xsemana');
 
-            if (xhr.readyState == 4) {
+            xhr.onreadystatechange = () => {
 
-                if (xhr.status == 200) {
+                if (xhr.readyState == 4) {
 
-                    const negociacoes = JSON.parse(xhr.responseText)
-                                          .map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor));
+                    if (xhr.status == 200) {
 
-                    cb(null, negociacoes);
+                        const negociacoes = JSON.parse(xhr.responseText)
+                            .map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor));
 
-                } else {
+                        resouve(negociacoes);
 
-                    console.log(xhr.responseText);
-                    
-                    cb('Não foi possível obter as negociações da semana', null);
-                }                
-            }
-        };
+                    } else {
 
-        xhr.send();
+                        console.log(xhr.responseText);
+
+                        reject('Não foi possível obter as negociações da semana');
+                    }
+                }
+            };
+
+            xhr.send();
+
+        });
     }
 }
