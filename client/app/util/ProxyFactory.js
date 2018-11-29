@@ -10,7 +10,6 @@ class ProxyFactory {
 
                     return function() {
 
-                        console.log(`"${prop}" disparou a armadilha`);
                         target[prop].apply(target, arguments);
 
                         armadilha(target);

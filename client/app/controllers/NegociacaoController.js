@@ -13,12 +13,29 @@ class NegociacaoController {
 
     adiciona(event) {
 
-        event.preventDefault();
-        this._negociacoes.adiciona(this._criaNegociacao());
-        this._mensagem.texto = 'Negociação adicionada com sucesso';
-        this._limpaFormulario();
+        try {
 
-        console.log(this._negociacoes.volumeTotal);
+            event.preventDefault();
+            this._negociacoes.adiciona(this._criaNegociacao());
+            this._mensagem.texto = 'Negociação adicionada com sucesso';
+
+            this._limpaFormulario();
+
+
+        } catch (err) {
+
+            console.log(err);
+            console.log(err.stack);
+
+            if(err instanceof DataInvalidaException) {
+
+                this._mensagem.texto = err.message;
+
+            } else {
+
+                this._mensagem.texto = 'Um erro não esperado aconteceu. Entre em contato com o suporte';
+            }            
+        }
     }
 
     apaga() {
@@ -36,6 +53,12 @@ class NegociacaoController {
     }
 
     _criaNegociacao() {
+
+        try {
+
+        } catch (error) {
+
+        }
 
         return new Negociacao(
             DateConverter.paraData(this._inputData.value),
