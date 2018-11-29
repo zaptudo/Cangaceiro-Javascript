@@ -9,6 +9,8 @@ class NegociacaoController {
 
         this._negociacoes = new Bind(new Negociacoes(), new NegociacoesView('#negociacoes'), 'adiciona', 'esvazia');
         this._mensagem = new Bind(new Mensagem(), new MensagemView('#mensagemView'), 'texto');
+
+        this._service = new NegociacaoService();
     }
 
     adiciona(event) {
@@ -27,14 +29,14 @@ class NegociacaoController {
             console.log(err);
             console.log(err.stack);
 
-            if(err instanceof DataInvalidaException) {
+            if (err instanceof DataInvalidaException) {
 
                 this._mensagem.texto = err.message;
 
             } else {
 
                 this._mensagem.texto = 'Um erro não esperado aconteceu. Entre em contato com o suporte';
-            }            
+            }
         }
     }
 
@@ -42,6 +44,23 @@ class NegociacaoController {
 
         this._negociacoes.esvazia();
         this._mensagem.texto = 'Negociações apagadas com sucesso';
+    }
+
+    importaNegociacoes() {
+
+        this._service.obterNegociacoesDaSemana((err, negociacoes) => {
+
+            if(err) {
+
+                this._mensagem.texto = 'Não foi possível obter as negociações da semana';
+
+                return;
+            }
+
+            negociacoes.forEach(negociacao => this._negociacoes.adiciona(negociacao));
+
+            this._mensagem.texto = 'Negociações importadas com sucesso';
+        });
     }
 
     _limpaFormulario() {
