@@ -9,51 +9,39 @@ class NegociacaoService {
 
         return this._http.get('negociacoes/semana')
             .then(
-                dados => {
 
-                    const negociacoes = dados.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor));
+                dados => dados.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor))
+            ,
+            err => {
 
-                    return negociacoes;
-                },
-                err => {
-                    
-                    throw new Error('Não foi possível obter as negociações da semana');
-                }
-            );
+                throw new Error('Não foi possível obter as negociações da semana');
+            });
     }
 
     obterNegociacoesDaSemanaAnterior() {
 
         return this._http.get('negociacoes/anterior')
             .then(
-                dados => {
 
-                    const negociacoes = dados.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor));
+                dados => dados.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor))
+            ,
+            err => {
 
-                    return negociacoes;
-                },
-                err => {
-                    
-                    throw new Error('Não foi possível obter as negociações da semana anterior');
-                }
-            );
+                throw new Error('Não foi possível obter as negociações da semana anterior');
+            });
     }
 
     obterNegociacoesDaSemanaRetrasada() {
 
         return this._http.get('negociacoes/retrasada')
             .then(
-                dados => {
 
-                    const negociacoes = dados.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor));
+                dados => dados.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor))
+            ,
+            err => {
 
-                    return negociacoes;
-                },
-                err => {
-                    
-                    throw new Error('Não foi possível obter as negociações da semana retrasada');
-                }
-            );
+                throw new Error('Não foi possível obter as negociações da semana retrasada');
+            });
     }
 
     obterNegociacoesDoPeriodo() {
@@ -62,15 +50,16 @@ class NegociacaoService {
             this.obterNegociacoesDaSemana(),
             this.obterNegociacoesDaSemanaAnterior(),
             this.obterNegociacoesDaSemanaRetrasada()
-        ])
-        .then(periodo => {
+            ])
+            .then(
+                
+                periodo => periodo.reduce((novoArray, item) => novoArray.concat(item), [])
+                                  .sort((a, b) => b.data.getTime() - a.data.getTime())
+            )
+            .catch(err => {
 
-            return periodo.reduce((novoArray, item) => novoArray.concat(item), []);
-        })
-        .catch(err => {
-
-            console.log(err);
-            throw new Error('Não foi possível obter as negociações do periodo');
-        });
+                console.log(err);
+                throw new Error('Não foi possível obter as negociações do periodo');
+            });
     }
 }
