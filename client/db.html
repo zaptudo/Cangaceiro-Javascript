@@ -1,0 +1,71 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Aprendendo IndexedDB</title>
+</head>
+
+<body>
+    <script>
+
+        function adiciona() {
+
+            ConnectionFactory.getConnection()
+                .then(connection => {
+
+                    const negociacao = new Negociacao(new Date(), 300, 3);
+
+                    const request = connection.transaction(['negociacoes'], 'readwrite')
+                        .objectStore('negociacoes')
+                        .add(negociacao);
+
+                    request.onsuccess = e => console.log('Negociação salva com sucesso');
+                    request.onerror = e => console.log('Erro ao salvar a negociação');
+                },
+                e => console.log('Não foi possível obter a conexão')
+                );
+        }
+
+        function listaTodos() {
+
+            const negociacoes = [];
+
+            ConnectionFactory.getConnection()
+                .then(connection => {
+
+                    const cursor = connection.transaction(['negociacoes'], 'readwrite')
+                        .objectStore('negociacoes')
+                        .openCursor();
+
+                    cursor.onsuccess = e => {
+
+                        const atual = e.target.result;
+
+                        if (atual) {
+
+                            const negociacao = new Negociacao(atual.value._data, atual.value._quantidade, atual.value._valor);
+
+                            negociacoes.push(negociacao);
+
+                            atual.continue();
+
+                        } else {
+
+                            console.log(negociacoes);
+                        }
+                    }
+
+                    cursor.onerror = e => console.log(e.target.error.name);
+                },
+                e => console.log('Não foi possível obter a conexão')
+                );
+
+
+        }
+
+    </script>
+<script src="app/domain/negociacao/Negociacao.js"></script>
+<script src="app/util/ConnectionFactory.js"></script>
+</body>
+
+</html>
