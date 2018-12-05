@@ -20,15 +20,21 @@ export class NegociacaoController {
         this._init();
     }
 
-    _init() {
+    async _init() {
 
-        getNegociacaoDao()
-            .then(dao => dao.listarTodos())
-            .then(negociacoes => negociacoes.forEach(negociacao => this._negociacoes.adiciona(negociacao)))
-            .catch(err => this._mensagem.texto = err);
+        try {
+
+            const dao = await getNegociacaoDao();
+            const negociacoes = await dao.listarTodos();
+            negociacoes.forEach(negociacao => this._negociacoes.adiciona(negociacao));
+
+        } catch (err) {
+
+            this._mensagem.texto = err.message;
+        }
     }
 
-    adiciona(event) {
+    async adiciona(event) {
 
         try {
 
@@ -36,16 +42,18 @@ export class NegociacaoController {
 
             const negociacao = this._criaNegociacao();
 
-            getNegociacaoDao()
-                .then(dao => dao.adiciona(negociacao))
-                .then(() => {
+            try {
 
-                    this._negociacoes.adiciona(negociacao);
-                    this._mensagem.texto = 'Negociação adicionada com sucesso';
+                const dao = await getNegociacaoDao();
+                await dao.adiciona(negociacao);
+                this._negociacoes.adiciona(negociacao);
+                this._mensagem.texto = 'Negociação adicionada com sucesso';
 
-                    this._limpaFormulario();
-                })
-                .catch(err => this._mensagem.texto = err);
+            } catch (err) {
+
+                this._mensagem.texto = err.message;
+            }
+
 
         } catch (err) {
 
@@ -63,28 +71,35 @@ export class NegociacaoController {
         }
     }
 
-    apaga() {
+    async apaga() {
 
-        getNegociacaoDao()
-            .then(dao => dao.apagaTodos())
-            .then(() => {
-                this._negociacoes.esvazia();
-                this._mensagem.texto = 'Negociações apagadas com sucesso';
-            })
-            .catch(err => this._mensagem.texto = err);
+        try {
+
+            const dao = await getNegociacaoDao();
+            await dao.apagaTodos();
+            this._negociacoes.esvazia();
+            this._mensagem.texto = 'Negociações apagadas com sucesso';
+
+        } catch (err) {
+
+            this._mensagem.texto = err.message;
+        }
     }
 
-    importaNegociacoes() {
+    async importaNegociacoes() {
 
-        this._service.obterNegociacoesDoPeriodo()
-            .then(negociacoes => {
+        try {
+            
+            const negociacoes = await this._service.obterNegociacoesDoPeriodo();
+            negociacoes.filter(novaNegociacao => !this._negociacoes.paraArray().some(negociacaoExistente => novaNegociacao.equals(negociacaoExistente)))
+                .forEach(negociacao => this._negociacoes.adiciona(negociacao));
 
-                negociacoes.filter(novaNegociacao => !this._negociacoes.paraArray().some(negociacaoExistente => novaNegociacao.equals(negociacaoExistente)))
-                    .forEach(negociacao => this._negociacoes.adiciona(negociacao));
+            this._mensagem.texto = 'Negociações importadas com sucesso';
 
-                this._mensagem.texto = 'Negociações importadas com sucesso';
-            })
-            .catch(err => this._mensagem.texto = err.message);
+        } catch (err) {
+
+            this._mensagem.texto = err.message;
+        }
     }
 
     _limpaFormulario() {
@@ -96,12 +111,6 @@ export class NegociacaoController {
     }
 
     _criaNegociacao() {
-
-        try {
-
-        } catch (error) {
-
-        }
 
         return new Negociacao(
             DateConverter.paraData(this._inputData.value),
