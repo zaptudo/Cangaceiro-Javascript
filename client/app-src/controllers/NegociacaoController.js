@@ -1,6 +1,6 @@
 import { Negociacoes, NegociacaoService, Negociacao } from '../domain/index.js';
 import { NegociacoesView, MensagemView, Mensagem, DataInvalidaException, DateConverter } from '../ui/index.js';
-import { getNegociacaoDao, Bind } from '../util/index.js';
+import { getNegociacaoDao, Bind, getExceptionMessage } from '../util/index.js';
 
 
 export class NegociacaoController {
@@ -30,44 +30,26 @@ export class NegociacaoController {
 
         } catch (err) {
 
-            this._mensagem.texto = err.message;
+            this._mensagem.texto = getExceptionMessage(err);
         }
     }
 
     async adiciona(event) {
 
+        event.preventDefault();
+
+        const negociacao = this._criaNegociacao();
+
         try {
 
-            event.preventDefault();
-
-            const negociacao = this._criaNegociacao();
-
-            try {
-
-                const dao = await getNegociacaoDao();
-                await dao.adiciona(negociacao);
-                this._negociacoes.adiciona(negociacao);
-                this._mensagem.texto = 'Negociação adicionada com sucesso';
-
-            } catch (err) {
-
-                this._mensagem.texto = err.message;
-            }
-
+            const dao = await getNegociacaoDao();
+            await dao.adiciona(negociacao);
+            this._negociacoes.adiciona(negociacao);
+            this._mensagem.texto = 'Negociação adicionada com sucesso';
 
         } catch (err) {
 
-            console.log(err);
-            console.log(err.stack);
-
-            if (err instanceof DataInvalidaException) {
-
-                this._mensagem.texto = err.message;
-
-            } else {
-
-                this._mensagem.texto = 'Um erro não esperado aconteceu. Entre em contato com o suporte';
-            }
+            this._mensagem.texto = getExceptionMessage(err);
         }
     }
 
@@ -82,14 +64,14 @@ export class NegociacaoController {
 
         } catch (err) {
 
-            this._mensagem.texto = err.message;
+            this._mensagem.texto = getExceptionMessage(err);
         }
     }
 
     async importaNegociacoes() {
 
         try {
-            
+
             const negociacoes = await this._service.obterNegociacoesDoPeriodo();
             negociacoes.filter(novaNegociacao => !this._negociacoes.paraArray().some(negociacaoExistente => novaNegociacao.equals(negociacaoExistente)))
                 .forEach(negociacao => this._negociacoes.adiciona(negociacao));
@@ -98,7 +80,7 @@ export class NegociacaoController {
 
         } catch (err) {
 
-            this._mensagem.texto = err.message;
+            this._mensagem.texto = getExceptionMessage(err);
         }
     }
 

@@ -1,5 +1,6 @@
 import { HttpService } from '../../util/HttpService.js';
 import { Negociacao } from './Negociacao.js';
+import { ApplicationException } from '../../util/index.js'
 
 
 export class NegociacaoService {
@@ -18,7 +19,7 @@ export class NegociacaoService {
             ,
             err => {
 
-                throw new Error('Não foi possível obter as negociações da semana');
+                throw new ApplicationException('Não foi possível obter as negociações da semana');
             });
     }
 
@@ -31,7 +32,7 @@ export class NegociacaoService {
             ,
             err => {
 
-                throw new Error('Não foi possível obter as negociações da semana anterior');
+                throw new ApplicationException('Não foi possível obter as negociações da semana anterior');
             });
     }
 
@@ -44,7 +45,7 @@ export class NegociacaoService {
             ,
             err => {
 
-                throw new Error('Não foi possível obter as negociações da semana retrasada');
+                throw new ApplicationException('Não foi possível obter as negociações da semana retrasada');
             });
     }
 
@@ -64,7 +65,7 @@ export class NegociacaoService {
         } catch (err) {
 
             console.log(err);
-            throw new Error('Não foi possível obter as negociações do periodo');
+            throw new ApplicationException('Não foi possível obter as negociações do periodo');
         }
 
     }
