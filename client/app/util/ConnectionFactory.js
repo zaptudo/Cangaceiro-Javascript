@@ -1,70 +1,78 @@
-const ConnectionFactory = (() => {
+System.register([], function (_export, _context) {
+    "use strict";
 
-    const stores = ['negociacoes'];
-    let connection = null;
+    return {
+        setters: [],
+        execute: function () {
+            const stores = ['negociacoes'];
+            let connection = null;
+            let close = null;
 
-    let close = null;
+            class ConnectionFactory {
 
-    return class ConnectionFactory {
+                constructor() {
 
-        constructor() {
-
-            throw new Error('Não é possível criar instâncias dessa classe');
-        }
-
-        static getConnection() {
-
-            return new Promise((resolve, reject) => {
-
-                if (connection) {
-
-                    return resolve(connection);
+                    throw new Error('Não é possível criar instâncias dessa classe');
                 }
 
-                const openRequest = indexedDB.open('jscangaceiro', 1);
+                static getConnection() {
 
-                openRequest.onupgradeneeded = e => ConnectionFactory._createStores(e.target.result);
+                    return new Promise((resolve, reject) => {
 
-                openRequest.onsuccess = e => {
+                        if (connection) {
 
-                    connection = e.target.result;
-                    close = connection.close.bind(connection);
+                            return resolve(connection);
+                        }
 
-                    connection.close = () => {
-                        throw new Error('Você não pode fechar diretamente a conexão');
-                    };
+                        const openRequest = indexedDB.open('jscangaceiro', 1);
 
-                    resolve(e.target.result);
-                };
+                        openRequest.onupgradeneeded = e => ConnectionFactory._createStores(e.target.result);
 
-                openRequest.onerror = e => {
+                        openRequest.onsuccess = e => {
 
-                    console.log(e.target.error);
+                            connection = e.target.result;
+                            close = connection.close.bind(connection);
 
-                    reject(e.target.error);
-                };
-            });
-        }
+                            connection.close = () => {
+                                throw new Error('Você não pode fechar diretamente a conexão');
+                            };
 
-        static closeConnection() {
+                            resolve(e.target.result);
+                        };
 
-            if(connection) {
+                        openRequest.onerror = e => {
 
-                close();
+                            console.log(e.target.error);
+
+                            reject(e.target.error);
+                        };
+                    });
+                }
+
+                static closeConnection() {
+
+                    if (connection) {
+
+                        close();
+                    }
+                }
+
+                static _createStores(connection) {
+
+                    stores.forEach(store => {
+
+                        if (connection.objectStoreNames.contains(store)) {
+
+                            connection.deleteObjectStore(store);
+                        }
+
+                        connection.createObjectStore(store, { autoIncrement: true });
+                    });
+                }
             }
+
+            _export('ConnectionFactory', ConnectionFactory);
         }
-
-        static _createStores(connection) {
-
-            stores.forEach(store => {
-
-                if (connection.objectStoreNames.contains(store)) {
-
-                    connection.deleteObjectStore(store);
-                }
-
-                connection.createObjectStore(store, { autoIncrement: true });
-            });
-        }
-    }
-})();
+    };
+});
+//# sourceMappingURL=ConnectionFactory.js.map

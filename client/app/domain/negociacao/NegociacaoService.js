@@ -1,65 +1,57 @@
-class NegociacaoService {
+System.register(['../../util/HttpService.js', './Negociacao.js'], function (_export, _context) {
+    "use strict";
 
-    constructor() {
+    var HttpService, Negociacao;
+    return {
+        setters: [function (_utilHttpServiceJs) {
+            HttpService = _utilHttpServiceJs.HttpService;
+        }, function (_NegociacaoJs) {
+            Negociacao = _NegociacaoJs.Negociacao;
+        }],
+        execute: function () {
+            class NegociacaoService {
 
-        this._http = new HttpService();
-    }
+                constructor() {
 
-    obterNegociacoesDaSemana() {
+                    this._http = new HttpService();
+                }
 
-        return this._http.get('negociacoes/semana')
-            .then(
+                obterNegociacoesDaSemana() {
 
-                dados => dados.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor))
-            ,
-            err => {
+                    return this._http.get('negociacoes/semana').then(dados => dados.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor)), err => {
 
-                throw new Error('Não foi possível obter as negociações da semana');
-            });
-    }
+                        throw new Error('Não foi possível obter as negociações da semana');
+                    });
+                }
 
-    obterNegociacoesDaSemanaAnterior() {
+                obterNegociacoesDaSemanaAnterior() {
 
-        return this._http.get('negociacoes/anterior')
-            .then(
+                    return this._http.get('negociacoes/anterior').then(dados => dados.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor)), err => {
 
-                dados => dados.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor))
-            ,
-            err => {
+                        throw new Error('Não foi possível obter as negociações da semana anterior');
+                    });
+                }
 
-                throw new Error('Não foi possível obter as negociações da semana anterior');
-            });
-    }
+                obterNegociacoesDaSemanaRetrasada() {
 
-    obterNegociacoesDaSemanaRetrasada() {
+                    return this._http.get('negociacoes/retrasada').then(dados => dados.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor)), err => {
 
-        return this._http.get('negociacoes/retrasada')
-            .then(
+                        throw new Error('Não foi possível obter as negociações da semana retrasada');
+                    });
+                }
 
-                dados => dados.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor))
-            ,
-            err => {
+                obterNegociacoesDoPeriodo() {
 
-                throw new Error('Não foi possível obter as negociações da semana retrasada');
-            });
-    }
+                    return Promise.all([this.obterNegociacoesDaSemana(), this.obterNegociacoesDaSemanaAnterior(), this.obterNegociacoesDaSemanaRetrasada()]).then(periodo => periodo.reduce((novoArray, item) => novoArray.concat(item), []).sort((a, b) => b.data.getTime() - a.data.getTime())).catch(err => {
 
-    obterNegociacoesDoPeriodo() {
+                        console.log(err);
+                        throw new Error('Não foi possível obter as negociações do periodo');
+                    });
+                }
+            }
 
-        return Promise.all([
-            this.obterNegociacoesDaSemana(),
-            this.obterNegociacoesDaSemanaAnterior(),
-            this.obterNegociacoesDaSemanaRetrasada()
-            ])
-            .then(
-                
-                periodo => periodo.reduce((novoArray, item) => novoArray.concat(item), [])
-                                  .sort((a, b) => b.data.getTime() - a.data.getTime())
-            )
-            .catch(err => {
-
-                console.log(err);
-                throw new Error('Não foi possível obter as negociações do periodo');
-            });
-    }
-}
+            _export('NegociacaoService', NegociacaoService);
+        }
+    };
+});
+//# sourceMappingURL=NegociacaoService.js.map
