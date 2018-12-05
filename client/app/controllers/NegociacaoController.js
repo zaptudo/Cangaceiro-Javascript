@@ -11,6 +11,17 @@ class NegociacaoController {
         this._mensagem = new Bind(new Mensagem(), new MensagemView('#mensagemView'), 'texto');
 
         this._service = new NegociacaoService();
+
+        this._init();
+    }
+
+    _init() {
+
+        DaoFactory
+            .getNegociacaoDao()
+            .then(dao => dao.listarTodos())
+            .then(negociacoes => negociacoes.forEach(negociacao => this._negociacoes.adiciona(negociacao)))
+            .catch(err => this._mensagem.texto = err);
     }
 
     adiciona(event) {
@@ -18,11 +29,20 @@ class NegociacaoController {
         try {
 
             event.preventDefault();
-            this._negociacoes.adiciona(this._criaNegociacao());
-            this._mensagem.texto = 'Negociação adicionada com sucesso';
 
-            this._limpaFormulario();
+            const negociacao = this._criaNegociacao();
 
+            DaoFactory
+                .getNegociacaoDao()
+                .then(dao => dao.adiciona(negociacao))
+                .then(() => {
+
+                    this._negociacoes.adiciona(negociacao);
+                    this._mensagem.texto = 'Negociação adicionada com sucesso';
+
+                    this._limpaFormulario();
+                })
+                .catch(err => this._mensagem.texto = err);
 
         } catch (err) {
 
@@ -42,8 +62,14 @@ class NegociacaoController {
 
     apaga() {
 
-        this._negociacoes.esvazia();
-        this._mensagem.texto = 'Negociações apagadas com sucesso';
+        DaoFactory
+            .getNegociacaoDao()
+            .then(dao => dao.apagaTodos())
+            .then(() => {
+                this._negociacoes.esvazia();
+                this._mensagem.texto = 'Negociações apagadas com sucesso';
+            })
+            .catch(err => this._mensagem.texto = err);
     }
 
     importaNegociacoes() {
@@ -52,7 +78,7 @@ class NegociacaoController {
             .then(negociacoes => {
 
                 negociacoes.filter(novaNegociacao => !this._negociacoes.paraArray().some(negociacaoExistente => novaNegociacao.equals(negociacaoExistente)))
-                           .forEach(negociacao => this._negociacoes.adiciona(negociacao));
+                    .forEach(negociacao => this._negociacoes.adiciona(negociacao));
 
                 this._mensagem.texto = 'Negociações importadas com sucesso';
             })
