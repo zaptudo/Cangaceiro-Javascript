@@ -1,5 +1,4 @@
 import { NegociacaoController } from './controllers/NegociacaoController.js';
-import { debounce } from './util/Debounce.js';
 
 
 const controller = new NegociacaoController();
@@ -7,10 +6,10 @@ const controller = new NegociacaoController();
 const $ = document.querySelector.bind(document);
 
 $('.form')
-        .addEventListener('submit', debounce(controller.adiciona.bind(controller), 1000));
+        .addEventListener('submit', controller.adiciona.bind(controller));
 
 $('#botao-apaga')
-        .addEventListener('click', debounce(controller.apaga.bind(controller), 1000));
+        .addEventListener('click', controller.apaga.bind(controller));
 
 $('#botao-importa')
-        .addEventListener('click', debounce(controller.importaNegociacoes.bind(controller), 1000));
+        .addEventListener('click', controller.importaNegociacoes.bind(controller));

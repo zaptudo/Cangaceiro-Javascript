@@ -1,6 +1,6 @@
 import { Negociacoes, NegociacaoService, Negociacao } from '../domain/index.js';
 import { NegociacoesView, MensagemView, Mensagem, DataInvalidaException, DateConverter } from '../ui/index.js';
-import { getNegociacaoDao, Bind, getExceptionMessage } from '../util/index.js';
+import { getNegociacaoDao, Bind, getExceptionMessage, debounce } from '../util/index.js';
 
 
 export class NegociacaoController {
@@ -34,6 +34,7 @@ export class NegociacaoController {
         }
     }
 
+    @debounce()
     async adiciona(event) {
 
         event.preventDefault();
@@ -53,6 +54,7 @@ export class NegociacaoController {
         }
     }
 
+    @debounce()
     async apaga() {
 
         try {
@@ -68,6 +70,7 @@ export class NegociacaoController {
         }
     }
 
+    @debounce()
     async importaNegociacoes() {
 
         try {
