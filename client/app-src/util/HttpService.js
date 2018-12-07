@@ -2,31 +2,18 @@ export class HttpService {
 
     get(url) {
 
-        return new Promise((resouve, reject) => {
+        return fetch(url)
+            .then(res => this._handleErrors(res))
+            .then(res => res.json());
+    }
 
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', url);
+    _handleErrors(res) {
 
-            xhr.onreadystatechange = () => {
+        if(!res.ok) {
 
-                if (xhr.readyState == 4) {
+            throw new Error(res.statusText);
+        }
 
-                    if (xhr.status == 200) {
-
-                        const dados = JSON.parse(xhr.responseText);
-
-                        resouve(dados);
-
-                    } else {
-
-                        console.log(xhr.responseText);
-
-                        reject(xhr.responseText);
-                    }
-                }
-            };
-
-            xhr.send();
-        });
+        return res;
     }
 }

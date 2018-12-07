@@ -1,6 +1,6 @@
 import { Negociacoes, NegociacaoService, Negociacao } from '../domain/index.js';
 import { NegociacoesView, MensagemView, Mensagem, DataInvalidaException, DateConverter } from '../ui/index.js';
-import { getNegociacaoDao, Bind, getExceptionMessage, debounce, controller } from '../util/index.js';
+import { getNegociacaoDao, Bind, getExceptionMessage, debounce, controller, bindEvent } from '../util/index.js';
 
 @controller('#data', '#quantidade', '#valor')
 export class NegociacaoController {
@@ -31,14 +31,15 @@ export class NegociacaoController {
         }
     }
 
+    @bindEvent('submit', '.form')
     @debounce()
     async adiciona(event) {
 
         event.preventDefault();
 
-        const negociacao = this._criaNegociacao();
-
         try {
+
+            const negociacao = this._criaNegociacao();
 
             const dao = await getNegociacaoDao();
             await dao.adiciona(negociacao);
@@ -51,6 +52,7 @@ export class NegociacaoController {
         }
     }
 
+    @bindEvent('click', '#botao-apaga')
     @debounce()
     async apaga() {
 
@@ -67,7 +69,8 @@ export class NegociacaoController {
         }
     }
 
-    @debounce()
+    @bindEvent('click', '#botao-importa')
+    @debounce()    
     async importaNegociacoes() {
 
         try {
@@ -97,7 +100,7 @@ export class NegociacaoController {
         return new Negociacao(
             DateConverter.paraData(this._inputData.value),
             parseInt(this._inputQuantidade.value),
-            parseFloat(this._inputValor.value)
+            //parseFloat(this._inputValor.value)
         );
     }
 }
