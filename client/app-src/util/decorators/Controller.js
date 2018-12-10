@@ -4,15 +4,40 @@ export function controller(...seletores) {
 
     return function(contructor) {
 
-        const contructorOriginal = contructor;
+        const constructorOriginal = contructor;
         
         const constructorNovo = function() {
 
-            return new contructorOriginal(...elements);   
+            const instance = new constructorOriginal(...elements);   
+
+            Object.getOwnPropertyNames(constructorOriginal.prototype)
+                .forEach(property => {
+
+                    if (Reflect.hasMetadata('bindEvent', instance, property)) {
+
+                        associaEvento(instance, Reflect.getMetadata('bindEvent', instance, property));
+                    }
+                });            
         }
 
-        constructorNovo.prototype = contructorOriginal.prototype;
+        constructorNovo.prototype = constructorOriginal.prototype;
 
         return constructorNovo;
     }
+}
+
+function associaEvento(instance, metadado) {
+
+    debugger;
+
+    document.querySelector(metadado.selector)
+        .addEventListener(metadado.event, event => {
+
+            if(metadado.prevent) {
+
+                event.preventDefault();
+            }
+
+            instance[metadado.propertyKey](event);
+        });
 }

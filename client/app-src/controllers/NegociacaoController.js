@@ -100,7 +100,7 @@ export class NegociacaoController {
         return new Negociacao(
             DateConverter.paraData(this._inputData.value),
             parseInt(this._inputQuantidade.value),
-            //parseFloat(this._inputValor.value)
+            parseFloat(this._inputValor.value)
         );
     }
 }
