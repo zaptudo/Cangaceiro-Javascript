@@ -1,0 +1,4 @@
+/* Aplicação de sombra na tabela */
+table {
+    box-shadow: 5px 5px 5px;
+}

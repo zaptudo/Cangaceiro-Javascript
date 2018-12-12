@@ -28,8 +28,6 @@ export function controller(...seletores) {
 
 function associaEvento(instance, metadado) {
 
-    debugger;
-
     document.querySelector(metadado.selector)
         .addEventListener(metadado.event, event => {
 
