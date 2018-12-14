@@ -1,4 +1,4 @@
-import { obrigatorio } from '../../util/Obrigatorio.js';
+import { obrigatorio } from '../../util/Obrigatorio';
 
 export class Negociacao {
 

@@ -1,6 +1,6 @@
-import { Negociacoes, NegociacaoService, Negociacao } from '../domain/index.js';
-import { NegociacoesView, MensagemView, Mensagem, DataInvalidaException, DateConverter } from '../ui/index.js';
-import { getNegociacaoDao, Bind, getExceptionMessage, debounce, controller, bindEvent } from '../util/index.js';
+import { Negociacoes, Negociacao } from '../domain';
+import { NegociacoesView, MensagemView, Mensagem, DataInvalidaException, DateConverter } from '../ui';
+import { getNegociacaoDao, Bind, getExceptionMessage, debounce, controller, bindEvent } from '../util';
 
 @controller('#data', '#quantidade', '#valor')
 export class NegociacaoController {
@@ -11,8 +11,6 @@ export class NegociacaoController {
 
         this._negociacoes = new Bind(new Negociacoes(), new NegociacoesView('#negociacoes'), 'adiciona', 'esvazia');
         this._mensagem = new Bind(new Mensagem(), new MensagemView('#mensagemView'), 'texto');
-
-        this._service = new NegociacaoService();
 
         this._init();
     }
@@ -75,7 +73,11 @@ export class NegociacaoController {
 
         try {
 
-            const negociacoes = await this._service.obterNegociacoesDoPeriodo();
+            const { NegociacaoService } = await import('../domain/negociacao/NegociacaoService');
+
+            const service = new NegociacaoService();
+
+            const negociacoes = await service.obterNegociacoesDoPeriodo();
             negociacoes.filter(novaNegociacao => !this._negociacoes.paraArray().some(negociacaoExistente => novaNegociacao.equals(negociacaoExistente)))
                 .forEach(negociacao => this._negociacoes.adiciona(negociacao));
 
